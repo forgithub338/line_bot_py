@@ -6,20 +6,21 @@ from linebot.v3.messaging import Configuration, ApiClient, MessagingApi, ReplyMe
 from linebot.v3.webhooks import MessageEvent, MemberJoinedEvent, MemberLeftEvent, TextMessageContent
 from linebot.v3.messaging import PushMessageRequest
 import mysql.connector
+import os
 
 # MySQL 連線設定
 db = mysql.connector.connect(
-    host="mysql-forgithub338.alwaysdata.net",
-    user="409300_free",
-    password="pplin1002",
-    database="forgithub338_player"
+    host=os.environ.get("DB_HOST"),
+    user=os.environ.get("DB_USER"),
+    password=os.environ.get("DB_PASSWORD"),
+    database=os.environ.get("DB_NAME")
 )
 cursor = db.cursor()
 
 # LINE 設定
 app = Flask(__name__)
-configuration = Configuration(access_token='l5jt20EuVkkt4WCekgdoVSVJzqGQMOYcGR7T1yvk5pYl1MXQ+KdBb/eQbjyFwj6pz2z8UwMrPtMlglJm+pThKDhQLMLpLY7L9Oc5tIfvRuhP1/rkrc7JR5ffBALAjOcIXk6KJ3qHQ7IB5pGrwsYBtAdB04t89/1O/w1cDnyilFU=')
-line_handler = WebhookHandler('e179f8c4ca6d43288a5a7737819f8de8')
+configuration = Configuration(access_token=os.environ.get("LINE_CHANNEL_ACCESS_TOKEN"))
+line_handler = WebhookHandler(os.environ.get("LINE_CHANNEL_SECRET"))
 
 # ----------- LINE CALLBACK ------------
 @app.route("/callback", methods=['POST'])
