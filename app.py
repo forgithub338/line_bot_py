@@ -102,7 +102,7 @@ def handle_message(event):
             results = cursor.fetchall()
 
             if results:
-                reply_lines = [f"{i+1}. Line名稱：{user}｜遊戲名稱：{game}" for i, (user, game) in enumerate(results)]
+                reply_lines = [f"{i+1}. {user}｜{game}" for i, (user, game) in enumerate(results)]
                 reply = "目前名單如下：\n" + "\n".join(reply_lines)
             else:
                 reply = "目前尚無資料。"
