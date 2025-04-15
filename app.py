@@ -95,6 +95,17 @@ def handle_message(event):
                 "bot/以遊戲名稱查詢/oooo",
                 "創建帳號：https://liff.line.me/2006989473-gqajDkdd"
             ])
+            
+        
+        elif message == "bot/名單":
+            cursor.execute("SELECT userName, gameName FROM player")
+            results = cursor.fetchall()
+
+            if results:
+                reply_lines = [f"{i+1}. Line名稱：{user}｜遊戲名稱：{game}" for i, (user, game) in enumerate(results)]
+                reply = "目前名單如下：\n" + "\n".join(reply_lines)
+            else:
+                reply = "目前尚無資料。"
 
         elif message.startswith("bot"):
             reply = "請輸入正確格式的指令喔！"
