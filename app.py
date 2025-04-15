@@ -22,60 +22,6 @@ app = Flask(__name__)
 configuration = Configuration(access_token=os.environ.get("LINE_CHANNEL_ACCESS_TOKEN"))
 line_handler = WebhookHandler(os.environ.get("LINE_CHANNEL_SECRET"))
 
-
-def get_all_group_member_ids(group_id):
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
-        all_ids = []
-        start = None
-
-        while True:
-            response = line_bot_api.get_group_member_ids(group_id, start=start)
-            all_ids.extend(response.member_ids)
-
-            if not response.next:
-                break
-            start = response.next
-
-        return all_ids
-
-
-def get_unregistered_members(group_id):
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
-
-        member_ids = get_all_group_member_ids(group_id)
-
-        if not member_ids:
-            return ["⚠️ 無法取得群組成員 ID，請確認 BOT 已加入群組"]
-
-        # 查已註冊 userId
-        registered_ids = set()
-        batch_size = 100  # 避免 IN (...) 太長
-        for i in range(0, len(member_ids), batch_size):
-            batch = member_ids[i:i+batch_size]
-            placeholders = ', '.join(['%s'] * len(batch))
-            query = f"SELECT userId FROM player WHERE userId IN ({placeholders})"
-            cursor.execute(query, tuple(batch))
-            registered_ids.update(user_id for (user_id,) in cursor.fetchall())
-
-        # 未註冊的 ID
-        unregistered_ids = [uid for uid in member_ids if uid not in registered_ids]
-
-        # 查名字
-        unregistered_names = []
-        for uid in unregistered_ids:
-            try:
-                profile = line_bot_api.get_group_member_profile(group_id, uid)
-                unregistered_names.append(profile.display_name)
-            except:
-                unregistered_names.append(f"無法取得名稱 ({uid[:6]})")
-
-        return unregistered_names
-
-
-
-
 # ----------- LINE CALLBACK ------------
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -139,19 +85,6 @@ def handle_message(event):
                 else:
                     reply = "目前尚無資料。"
 
-            elif message == "bot/查詢未登錄成員":
-                if hasattr(event.source, "group_id"):
-                    groupId = event.source.group_id
-                    unregistered_names = get_unregistered_members(groupId)
-
-                    if unregistered_names:
-                        reply_lines = [f"{i+1}. {name}" for i, name in enumerate(unregistered_names)]
-                        reply = "以下成員尚未登錄遊戲帳號：\n" + "\n".join(reply_lines)
-                    else:
-                        reply = "所有成員都已經完成登錄"
-                else:
-                    reply = "請在群組中使用此指令。"
-
             elif message.startswith("bot"):
                 reply = "請輸入正確格式的指令喔！"
 
@@ -162,7 +95,9 @@ def handle_message(event):
                 )
             )
     except Exception as e:
+        import traceback
         print("❌ 錯誤發生：", e)
+        traceback.print_exc()
         abort(500)
 
 # ----------- 成員退出自動刪除資料 ------------
@@ -201,11 +136,14 @@ def handle_join(event):
         line_bot_api = MessagingApi(api_client)
         groupId = event.source.group_id
         reply_message = [
-            "歡迎加入天謀雲雨群組",
+            "歡迎加入天謀雲月群組🥳",
+            "本群除政治外都可聊，訊息多可關提醒，遊戲內必要、緊急情況才會@all😁"
             "以下為本群機器人功能：",
             "bot/以Line名稱查詢/oooo",
             "bot/以遊戲名稱查詢/oooo",
-            "創建帳號：https://liff.line.me/2006989473-gqajDkdd"
+            "bot/名單",
+            "點按連結將帳號加入資料庫：",
+            "https://liff.line.me/2006989473-gqajDkdd"
         ]
         line_bot_api.push_message(
             PushMessageRequest(
