@@ -81,7 +81,8 @@ def handle_message(event):
 
                 if results:
                     reply_lines = [f"{i+1}. {user}｜{game}" for i, (user, game) in enumerate(results)]
-                    reply = "目前名單如下：\n" + "\n".join(reply_lines)
+                    # reply = "目前名單如下：\n" + "\n".join(reply_lines)
+                    reply = results
                 else:
                     reply = "目前尚無資料。"
 
@@ -137,7 +138,7 @@ def handle_join(event):
         groupId = event.source.group_id
         reply_message = [
             "歡迎加入天謀雲月群組🥳",
-            "本群除政治外都可聊，訊息多可關提醒，遊戲內必要、緊急情況才會@all😁"
+            "本群除政治外都可聊，訊息多可關提醒，遊戲內必要、緊急情況才會@all😁",
             "以下為本群機器人功能：",
             "bot/以Line名稱查詢/oooo",
             "bot/以遊戲名稱查詢/oooo",
