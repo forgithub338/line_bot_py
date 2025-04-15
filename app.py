@@ -53,6 +53,9 @@ def handle_message(event):
                 queryName = message.split("/")[2]
                 cursor.execute("SELECT gameName FROM player WHERE userName = %s", (queryName,))
                 results = cursor.fetchall()
+
+                db.commit()
+                
                 if results:
                     reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}" for r in results)
                 else:
@@ -62,6 +65,9 @@ def handle_message(event):
                 gameName = message.split("/")[2]
                 cursor.execute("SELECT userName FROM player WHERE gameName = %s", (gameName,))
                 result = cursor.fetchone()
+
+                db.commit()
+
                 if result:
                     reply = f"遊戲名稱 {gameName} 查詢結果：\nLine名稱：{result[0]}"
                 else:
@@ -78,6 +84,8 @@ def handle_message(event):
             elif message == "bot/名單":
                 cursor.execute("SELECT userName, gameName FROM player")
                 results = cursor.fetchall()
+                
+                db.commit()
 
                 if results:
                     reply_lines = [f"{i+1}. {user}｜{game}" for i, (user, game) in enumerate(results)]
