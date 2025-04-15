@@ -44,14 +44,20 @@ def get_unregistered_members(group_id):
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
 
-        # 改成抓全部 ID
         member_ids = get_all_group_member_ids(group_id)
 
-        # 查資料庫中哪些人已經註冊
-        placeholders = ', '.join(['%s'] * len(member_ids))
-        query = f"SELECT userId FROM player WHERE userId IN ({placeholders})"
-        cursor.execute(query, tuple(member_ids))
-        registered_ids = set(user_id for (user_id,) in cursor.fetchall())
+        if not member_ids:
+            return ["⚠️ 無法取得群組成員 ID，請確認 BOT 已加入群組"]
+
+        # 查已註冊 userId
+        registered_ids = set()
+        batch_size = 100  # 避免 IN (...) 太長
+        for i in range(0, len(member_ids), batch_size):
+            batch = member_ids[i:i+batch_size]
+            placeholders = ', '.join(['%s'] * len(batch))
+            query = f"SELECT userId FROM player WHERE userId IN ({placeholders})"
+            cursor.execute(query, tuple(batch))
+            registered_ids.update(user_id for (user_id,) in cursor.fetchall())
 
         # 未註冊的 ID
         unregistered_ids = [uid for uid in member_ids if uid not in registered_ids]
@@ -63,9 +69,10 @@ def get_unregistered_members(group_id):
                 profile = line_bot_api.get_group_member_profile(group_id, uid)
                 unregistered_names.append(profile.display_name)
             except:
-                unregistered_names.append("無法取得名稱")
+                unregistered_names.append(f"無法取得名稱 ({uid[:6]})")
 
         return unregistered_names
+
 
 
 
@@ -91,68 +98,72 @@ def callback():
 # ----------- LINE 訊息處理 ------------
 @line_handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
-        message = event.message.text
+    try: 
+        with ApiClient(configuration) as api_client:
+            line_bot_api = MessagingApi(api_client)
+            message = event.message.text
 
-        if message.startswith("bot/以Line名稱查詢/"):
-            queryName = message.split("/")[2]
-            cursor.execute("SELECT gameName FROM player WHERE userName = %s", (queryName,))
-            results = cursor.fetchall()
-            if results:
-                reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}" for r in results)
-            else:
-                reply = f"找不到 Line名稱 {queryName} 的紀錄"
-
-        elif message.startswith("bot/以遊戲名稱查詢/"):
-            gameName = message.split("/")[2]
-            cursor.execute("SELECT userName FROM player WHERE gameName = %s", (gameName,))
-            result = cursor.fetchone()
-            if result:
-                reply = f"遊戲名稱 {gameName} 查詢結果：\nLine名稱：{result[0]}"
-            else:
-                reply = f"找不到遊戲名稱 {gameName} 的紀錄"
-
-        elif message == "bot/功能查詢":
-            reply = "\n".join([
-                "bot/以Line名稱查詢/oooo",
-                "bot/以遊戲名稱查詢/oooo",
-                "創建帳號：https://liff.line.me/2006989473-gqajDkdd"
-            ])
-            
-        
-        elif message == "bot/名單":
-            cursor.execute("SELECT userName, gameName FROM player")
-            results = cursor.fetchall()
-
-            if results:
-                reply_lines = [f"{i+1}. {user}｜{game}" for i, (user, game) in enumerate(results)]
-                reply = "目前名單如下：\n" + "\n".join(reply_lines)
-            else:
-                reply = "目前尚無資料。"
-
-        elif message == "bot/查詢未登錄成員":
-            if hasattr(event.source, "group_id"):
-                groupId = event.source.group_id
-                unregistered_names = get_unregistered_members(groupId)
-
-                if unregistered_names:
-                    reply_lines = [f"{i+1}. {name}" for i, name in enumerate(unregistered_names)]
-                    reply = "以下成員尚未登錄遊戲帳號：\n" + "\n".join(reply_lines)
+            if message.startswith("bot/以Line名稱查詢/"):
+                queryName = message.split("/")[2]
+                cursor.execute("SELECT gameName FROM player WHERE userName = %s", (queryName,))
+                results = cursor.fetchall()
+                if results:
+                    reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}" for r in results)
                 else:
-                    reply = "所有成員都已經完成登錄"
-            else:
-                reply = "請在群組中使用此指令。"
+                    reply = f"找不到 Line名稱 {queryName} 的紀錄"
 
-        elif message.startswith("bot"):
-            reply = "請輸入正確格式的指令喔！"
+            elif message.startswith("bot/以遊戲名稱查詢/"):
+                gameName = message.split("/")[2]
+                cursor.execute("SELECT userName FROM player WHERE gameName = %s", (gameName,))
+                result = cursor.fetchone()
+                if result:
+                    reply = f"遊戲名稱 {gameName} 查詢結果：\nLine名稱：{result[0]}"
+                else:
+                    reply = f"找不到遊戲名稱 {gameName} 的紀錄"
 
-        line_bot_api.reply_message_with_http_info(
-            ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[TextMessage(text=reply)]
+            elif message == "bot/功能查詢":
+                reply = "\n".join([
+                    "bot/以Line名稱查詢/oooo",
+                    "bot/以遊戲名稱查詢/oooo",
+                    "創建帳號：https://liff.line.me/2006989473-gqajDkdd"
+                ])
+                
+            
+            elif message == "bot/名單":
+                cursor.execute("SELECT userName, gameName FROM player")
+                results = cursor.fetchall()
+
+                if results:
+                    reply_lines = [f"{i+1}. {user}｜{game}" for i, (user, game) in enumerate(results)]
+                    reply = "目前名單如下：\n" + "\n".join(reply_lines)
+                else:
+                    reply = "目前尚無資料。"
+
+            elif message == "bot/查詢未登錄成員":
+                if hasattr(event.source, "group_id"):
+                    groupId = event.source.group_id
+                    unregistered_names = get_unregistered_members(groupId)
+
+                    if unregistered_names:
+                        reply_lines = [f"{i+1}. {name}" for i, name in enumerate(unregistered_names)]
+                        reply = "以下成員尚未登錄遊戲帳號：\n" + "\n".join(reply_lines)
+                    else:
+                        reply = "所有成員都已經完成登錄"
+                else:
+                    reply = "請在群組中使用此指令。"
+
+            elif message.startswith("bot"):
+                reply = "請輸入正確格式的指令喔！"
+
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[TextMessage(text=reply)]
+                )
             )
-        )
+    except Exception as e:
+        print("❌ 錯誤發生：", e)
+        abort(500)
 
 # ----------- 成員退出自動刪除資料 ------------
 @line_handler.add(MemberLeftEvent)
