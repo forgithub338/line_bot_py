@@ -55,7 +55,7 @@ def handle_message(event):
                 results = cursor.fetchall()
 
                 db.commit()
-                
+
                 if results:
                     reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}" for r in results)
                 else:
@@ -151,7 +151,7 @@ def handle_join(event):
             "bot/以遊戲名稱查詢/oooo",
             "bot/名單",
             "點按連結將帳號加入資料庫：",
-            "https://liff.line.me/2006989473-gqajDkdd"
+            "https://liff.line.me/2007275305-5B4p9VMY"
         ]
         line_bot_api.push_message(
             PushMessageRequest(
