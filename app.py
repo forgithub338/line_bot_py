@@ -96,6 +96,9 @@ def handle_message(event):
             elif message.startswith("bot"):
                 reply = "請輸入正確格式的指令喔！"
 
+            elif message == "groupId":
+                reply = event.source.group_id
+
             line_bot_api.reply_message_with_http_info(
                 ReplyMessageRequest(
                     reply_token=event.reply_token,
