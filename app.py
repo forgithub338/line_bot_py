@@ -75,9 +75,11 @@ def handle_message(event):
 
             elif message == "bot/功能查詢":
                 reply = "\n".join([
+                    "bot/名單",
                     "bot/以Line名稱查詢/oooo",
                     "bot/以遊戲名稱查詢/oooo",
-                    "創建帳號：https://liff.line.me/2007275305-5B4p9VMY"
+                    "點按連結將帳號加入資料庫：",
+                    "https://liff.line.me/2007275305-5B4p9VMY"
                 ])
                 
             
@@ -150,9 +152,10 @@ def handle_join(event):
             "歡迎加入天謀雲月群組🥳",
             "本群除政治外都可聊，訊息多可關提醒，遊戲內必要、緊急情況才會@all😁",
             "以下為本群機器人功能：",
+            "bot/名單",
+            "bot/功能查詢"
             "bot/以Line名稱查詢/oooo",
             "bot/以遊戲名稱查詢/oooo",
-            "bot/名單",
             "點按連結將帳號加入資料庫：",
             "https://liff.line.me/2007275305-5B4p9VMY"
         ]
