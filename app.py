@@ -77,7 +77,7 @@ def handle_message(event):
                 reply = "\n".join([
                     "bot/以Line名稱查詢/oooo",
                     "bot/以遊戲名稱查詢/oooo",
-                    "創建帳號：https://liff.line.me/2006989473-gqajDkdd"
+                    "創建帳號：https://liff.line.me/2007275305-5B4p9VMY"
                 ])
                 
             
