@@ -58,7 +58,7 @@ def handle_message(event):
                 db.commit()
 
                 if results_line:
-                    reply = "Line名稱查詢結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n  遊戲名稱：{game}\n  所屬聯盟：{league}\n  分營：{camp}\n----------------------------" for i,(user, game, league, camp) in enumerate(results_line))
+                    reply = "Line名稱查詢結果：\n" + "\n".join(f"{i+1}.   Line名稱：{user}\n    遊戲名稱：{game}\n    所屬聯盟：{league}\n  分營：{camp}\n----------------------------" for i,(user, game, league, camp) in enumerate(results_line))
                 else:
                     reply = f"找不到 Line名稱 {queryName} 的紀錄"
 
@@ -70,7 +70,7 @@ def handle_message(event):
                 db.commit()
 
                 if results_game:
-                    reply += f"遊戲名稱查詢結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n  遊戲名稱：{game}\n  所屬聯盟：{league}\n  分營：{camp}\n---------------------------" for i,(user, game, league, camp) in enumerate(results_game))
+                    reply += f"遊戲名稱查詢結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n    遊戲名稱：{game}\n    所屬聯盟：{league}\n    分營：{camp}\n---------------------------" for i,(user, game, league, camp) in enumerate(results_game))
                 else:
                     reply += f"找不到遊戲名稱 {queryName} 的紀錄"
             # if message.startswith("bot/以Line名稱查詢/"):
