@@ -52,7 +52,7 @@ def handle_message(event):
             if message.startswith("bot/查詢/"):
                 queryName = message.split("/")[2]
                 likeName= f"%%{queryName}%%"
-                cursor.execute("SELECT gameName, league, camp FROM player WHERE userName LIKE %s", {likeName})
+                cursor.execute("SELECT gameName, league, camp FROM player WHERE userName LIKE %s", (likeName,))
                 results_line = cursor.fetchall()
 
                 db.commit()
@@ -64,7 +64,7 @@ def handle_message(event):
 
                 reply += "\n============================\n"
 
-                cursor.execute("SELECT userName, league, camp FROM player WHERE gameName LIKE %s", {likeName})
+                cursor.execute("SELECT userName, league, camp FROM player WHERE gameName LIKE %s", (likeName,))
                 results_game = cursor.fetchall()
                 
                 db.commit()
