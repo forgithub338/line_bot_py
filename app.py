@@ -51,7 +51,8 @@ def handle_message(event):
 
             if message.startswith("bot/查詢/"):
                 queryName = message.split("/")[2]
-                cursor.execute("SELECT gameName, league, camp FROM player WHERE userName = %s", (queryName,))
+                likeName= "%" + queryName + "%"
+                cursor.execute(f"SELECT gameName, league, camp FROM player WHERE userName LIKE {likeName}")
                 results_line = cursor.fetchall()
 
                 db.commit()
@@ -61,9 +62,9 @@ def handle_message(event):
                 else:
                     reply = f"找不到 Line名稱 {queryName} 的紀錄"
 
-                reply += "===============================\n"
+                reply += "\n============================\n"
 
-                cursor.execute("SELECT userName, league, camp FROM player WHERE gameName = %s", (queryName,))
+                cursor.execute(f"SELECT userName, league, camp FROM player WHERE gameName LIKE {likeName}")
                 result = cursor.fetchone()
                 
                 db.commit()
