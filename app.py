@@ -61,7 +61,7 @@ def handle_message(event):
                 else:
                     reply = f"找不到 Line名稱 {queryName} 的紀錄"
 
-                reply += "================="
+                reply += "==========================\n"
 
                 cursor.execute("SELECT userName, league, camp FROM player WHERE gameName = %s", (queryName,))
                 result = cursor.fetchone()
