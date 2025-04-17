@@ -51,25 +51,25 @@ def handle_message(event):
 
             if message.startswith("bot/以Line名稱查詢/"):
                 queryName = message.split("/")[2]
-                cursor.execute("SELECT gameName FROM player WHERE userName = %s", (queryName,))
+                cursor.execute("SELECT gameName, league, camp FROM player WHERE userName = %s", (queryName,))
                 results = cursor.fetchall()
 
                 db.commit()
 
                 if results:
-                    reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}" for r in results)
+                    reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}\n所屬聯盟：{r[1]} 分營：{r[2]}" for r in results)
                 else:
                     reply = f"找不到 Line名稱 {queryName} 的紀錄"
 
             elif message.startswith("bot/以遊戲名稱查詢/"):
                 gameName = message.split("/")[2]
-                cursor.execute("SELECT userName FROM player WHERE gameName = %s", (gameName,))
+                cursor.execute("SELECT userName, league, camp FROM player WHERE gameName = %s", (gameName,))
                 result = cursor.fetchone()
 
                 db.commit()
 
                 if result:
-                    reply = f"遊戲名稱 {gameName} 查詢結果：\nLine名稱：{result[0]}"
+                    reply = f"遊戲名稱 {gameName} 查詢結果：\nLine名稱：{result[0]}\n所屬聯盟：{result[1]} 分營：{result[2]}"
                 else:
                     reply = f"找不到遊戲名稱 {gameName} 的紀錄"
 
@@ -79,24 +79,25 @@ def handle_message(event):
                     "bot/以Line名稱查詢/oooo",
                     "bot/以遊戲名稱查詢/oooo",
                     "點按連結將帳號加入資料庫：",
-                    "https://liff.line.me/2007275305-5B4p9VMY"
+                    "https://liff.line.me/2007275305-5B4p9VMY",
+                    "請注意，搜尋功能需使用全名"
                 ])
                 
             
             elif message == "bot/名單":
-                cursor.execute("SELECT userName, gameName FROM player")
+                cursor.execute("SELECT userName, gameName, league, camp FROM player")
                 results = cursor.fetchall()
                 
                 db.commit()
 
                 if results:
-                    reply_lines = [f"{i+1}. {user}｜{game}" for i, (user, game) in enumerate(results)]
+                    reply_lines = [f"{i+1}. {user}｜{game} \n  所屬聯盟：{league} 分營：{camp}" for i, (user, game, league, camp) in enumerate(results)]
                     reply = "目前名單如下：\n" + "\n".join(reply_lines)
                 else:
                     reply = "目前尚無資料。"
 
             elif message.startswith("bot"):
-                reply = "請輸入正確格式的指令喔！"
+                reply = "未知指令格式，請使用\"bot/功能查詢\" 查詢所有機器人功能"
 
             elif message == "groupId":
                 reply = event.source.group_id
