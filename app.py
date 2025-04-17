@@ -73,35 +73,11 @@ def handle_message(event):
                     reply += f"遊戲名稱查詢結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n    遊戲名稱：{game}\n    所屬聯盟：{league}\n    分營：{camp}\n---------------------------" for i,(user, game, league, camp) in enumerate(results_game))
                 else:
                     reply += f"找不到遊戲名稱 {queryName} 的紀錄"
-            # if message.startswith("bot/以Line名稱查詢/"):
-            #     queryName = message.split("/")[2]
-            #     cursor.execute("SELECT gameName, league, camp FROM player WHERE userName = %s", (queryName,))
-            #     results = cursor.fetchall()
-
-            #     db.commit()
-
-            #     if results:
-            #         reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}\n所屬聯盟：{r[1]} 分營：{r[2]}" for r in results)
-            #     else:
-            #         reply = f"找不到 Line名稱 {queryName} 的紀錄"
-
-            # elif message.startswith("bot/以遊戲名稱查詢/"):
-            #     gameName = message.split("/")[2]
-            #     cursor.execute("SELECT userName, league, camp FROM player WHERE gameName = %s", (gameName,))
-            #     result = cursor.fetchone()
-
-            #     db.commit()
-
-            #     if result:
-            #         reply = f"遊戲名稱 {gameName} 查詢結果：\nLine名稱：{result[0]}\n所屬聯盟：{result[1]} 分營：{result[2]}"
-            #     else:
-            #         reply = f"找不到遊戲名稱 {gameName} 的紀錄"
 
             elif message == "bot/功能查詢":
                 reply = "\n".join([
                     "bot/名單",
-                    "bot/以Line名稱查詢/oooo",
-                    "bot/以遊戲名稱查詢/oooo",
+                    "bot/查詢/oooo",
                     "點按連結將帳號加入資料庫：",
                     "https://liff.line.me/2007275305-5B4p9VMY",
                     "請注意，搜尋功能需使用全名"
@@ -178,9 +154,8 @@ def handle_join(event):
             "本群除政治外都可聊，訊息多可關提醒，遊戲內必要、緊急情況才會@all😁",
             "以下為本群機器人功能：",
             "bot/名單",
-            "bot/功能查詢"
-            "bot/以Line名稱查詢/oooo",
-            "bot/以遊戲名稱查詢/oooo",
+            "bot/功能查詢",
+            "bot/查詢/oooo",
             "點按連結將帳號加入資料庫：",
             "https://liff.line.me/2007275305-5B4p9VMY"
         ]
