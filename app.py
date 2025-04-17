@@ -58,7 +58,7 @@ def handle_message(event):
                 db.commit()
 
                 if results_line:
-                    reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}\n所屬聯盟：{r[1]} 分營：{r[2]}" for r in results)
+                    reply = f"Line名稱 {queryName} 查詢結果：\n" + "\n".join(f"遊戲名稱：{r[0]}\n所屬聯盟：{r[1]} 分營：{r[2]}" for r in results_line)
                 else:
                     reply = f"找不到 Line名稱 {queryName} 的紀錄"
 
