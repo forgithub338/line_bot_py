@@ -74,15 +74,27 @@ def handle_message(event):
                 else:
                     reply += f"找不到遊戲名稱 {queryName} 的紀錄"
 
-            elif message.startswith("bot/分營/"):
+            elif message.startswith("bot/分盟/"):
+                leagueName = message.split("/")[1]
                 campName = message.split("/")[2]
-                cursor.execute("SELECT userName, gameName FROM player WHERE camp = %s", (campName,))
+                cursor.execute("SELECT userName, gameName FROM player WHERE league = %s AND camp = %s", (leagueName, campName,))
                 results = cursor.fetchall()
 
                 db.commit()
 
                 if results:
-                    reply = f"{campName} 搜尋結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n    遊戲名稱：{game}\n" for i, (user, game) in enumerate(results))
+                    reply = f"{leagueName} 丨 {campName} 搜尋結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n    遊戲名稱：{game}\n" for i, (user, game) in enumerate(results))
+
+            elif message.startswith("bot/主盟/"):
+                leagueName = message.split("/")[1]
+                campName = message.split("/")[2]
+                cursor.execute("SELECT userName, gameName FROM player WHERE league = %s AND camp = %s", (leagueName, campName,))
+                results = cursor.fetchall()
+
+                db.commit()
+
+                if results:
+                    reply = f"{leagueName} 丨 {campName} 搜尋結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n    遊戲名稱：{game}\n" for i, (user, game) in enumerate(results))
 
             elif message == "bot/功能查詢":
                 reply = "\n".join([
