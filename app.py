@@ -134,8 +134,8 @@ def handle_message(event):
 
                     db.commit()
 
-                    reply = f"{userName} 退出群組，已刪除遊戲帳號："
-                    reply += "\n" + "\n".join(f"遊戲名稱：{r[0]}" for r in results)
+                    reply = f"{userName}退出群組，已刪除帳號紀錄："
+                    reply += "\n" + "\n".join(f"{r[0]}" for r in results)
                 else:
                     reply = "目前沒有退群成員紀錄。"
 
