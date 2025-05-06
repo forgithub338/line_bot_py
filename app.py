@@ -84,6 +84,8 @@ def handle_message(event):
 
                 if results:
                     reply = f"{leagueName} 丨 {campName} 搜尋結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n    遊戲名稱：{game}\n" for i, (user, game) in enumerate(results))
+                else:
+                    reply = f"{leagueName} 丨 {campName} 查無資料。"
 
             elif message.startswith("bot/天謀/"):
                 leagueName = message.split("/")[1]
@@ -95,6 +97,8 @@ def handle_message(event):
 
                 if results:
                     reply = f"{leagueName} 丨 {campName} 搜尋結果：\n" + "\n".join(f"{i+1}. Line名稱：{user}\n    遊戲名稱：{game}\n" for i, (user, game) in enumerate(results))
+                else:
+                    reply = f"{leagueName} 丨 {campName} 查無資料。"
 
             elif message == "bot/功能查詢":
                 reply = "\n".join([
