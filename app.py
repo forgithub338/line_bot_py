@@ -49,7 +49,16 @@ def handle_message(event):
             line_bot_api = MessagingApi(api_client)
             message = event.message.text
 
-            if message.startswith("bot/查詢/"):
+            if message == "bot/歡迎":
+                reply = "\n".join([
+                "歡迎加入天謀雲月群組🥳",
+                "本群除政治外都可聊，訊息多可關提醒，遊戲內必要、緊急情況才會@all😁",
+                "請使用'bot/功能查詢'查找本群機器人功能：",
+                "點按連結將帳號加入資料庫：",
+                "https://liff.line.me/2007275305-5B4p9VMY",
+                ])
+
+            elif message.startswith("bot/查詢/"):
                 queryName = message.split("/")[2]
                 likeName= f"%%{queryName}%%"
                 cursor.execute("SELECT userName, gameName, league, camp FROM player WHERE userName LIKE %s", (likeName,))
@@ -102,8 +111,11 @@ def handle_message(event):
 
             elif message == "bot/功能查詢":
                 reply = "\n".join([
+                    "bot/歡迎",
                     "bot/名單",
-                    "bot/查詢/oooo",
+                    "bot/查詢/[部分遊戲名 or Line名稱]",
+                    "bot/[天謀 or 晉國]/[分營名]",
+                    "bot/最新退群成員",
                     "點按連結將帳號加入資料庫：",
                     "https://liff.line.me/2007275305-5B4p9VMY",
                 ])
@@ -133,13 +145,10 @@ def handle_message(event):
 
                     db.commit()
 
-                    reply = f"{userName}退出群組，已刪除帳號紀錄："
+                    reply = f"{userName}退出群組 刪除遊戲帳號："
                     reply += "\n" + "\n".join(f"{r[0]}" for r in results)
                 else:
                     reply = "目前沒有退群成員紀錄。"
-
-
-
 
             elif message.startswith("bot") or message.startswith("Bot"):
                 reply = "未知指令格式，請使用\"bot/功能查詢\" 查詢所有機器人功能"
