@@ -121,6 +121,26 @@ def handle_message(event):
                     reply = "目前名單如下：\n" + "\n".join(reply_lines)
                 else:
                     reply = "目前尚無資料。"
+            
+            elif message == "bot/最新退群成員":
+                cursor.execute("SELECT userName FROM userLeave ORDER BY leaveTime DESC LIMIT 1")
+                result = cursor.fetchone()
+
+                if result:
+                    userName = result[0]
+
+                    cursor.execute("SELECT gameName FROM userLeave WHERE userName = %s", (userName,))
+                    results = cursor.fetchall()
+
+                    db.commit()
+
+                    reply = f"{userName} 退出群組，已刪除遊戲帳號："
+                    reply += "\n" + "\n".join(f"遊戲名稱：{r[0]}" for r in results)
+                else:
+                    reply = "目前沒有退群成員紀錄。"
+
+
+
 
             elif message.startswith("bot") or message.startswith("Bot"):
                 reply = "未知指令格式，請使用\"bot/功能查詢\" 查詢所有機器人功能"
@@ -152,22 +172,13 @@ def handle_leave(event):
         results = cursor.fetchall()
 
         if results:
-            lineName = results[0][1]  # 取第一筆的 userName
+            for r in results:
+                cursor.execute("INSERT INTO userLeave (userName, gameName) VALUES (%s, %s)", (r[1], r[2]))
+            cursor.execute("DELETE FROM player WHERE userId = %s", (userId,))
         else:
-            lineName = "未知使用者"
+            cursor.execute("INSERT INTO userLeave (userName, gameName) VALUES (%s, %s)", ("未知使用者", "無輸入帳號"))
 
-        cursor.execute("DELETE FROM player WHERE userId = %s", (userId,))
         db.commit()
-
-        reply = [f"{lineName} 退出群組，已刪除遊戲帳號："]
-        reply += [f"遊戲名稱：{r[2]}" for r in results]
-
-        line_bot_api.push_message(
-            PushMessageRequest(
-                to=groupId,
-                messages=[TextMessage(text="\n".join(reply))]
-                ) 
-            )
 
 # ----------- 成員加入歡迎訊息 ------------
 @line_handler.add(MemberJoinedEvent)
