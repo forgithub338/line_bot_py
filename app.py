@@ -75,7 +75,7 @@ def handle_message(event):
                     reply += f"找不到遊戲名稱 {queryName} 的紀錄"
 
             elif message.startswith("bot/晉國/"):
-                leagueName = message.split("/")[1]
+                leagueName = "分盟"
                 campName = message.split("/")[2]
                 cursor.execute("SELECT userName, gameName FROM player WHERE league = %s AND camp = %s", (leagueName, campName,))
                 results = cursor.fetchall()
@@ -88,7 +88,7 @@ def handle_message(event):
                     reply = f"{leagueName} 丨 {campName} 查無資料。"
 
             elif message.startswith("bot/天謀/"):
-                leagueName = message.split("/")[1]
+                leagueName = "主盟"
                 campName = message.split("/")[2]
                 cursor.execute("SELECT userName, gameName FROM player WHERE league = %s AND camp = %s", (leagueName, campName,))
                 results = cursor.fetchall()
