@@ -106,7 +106,6 @@ def handle_message(event):
                     "bot/查詢/oooo",
                     "點按連結將帳號加入資料庫：",
                     "https://liff.line.me/2007275305-5B4p9VMY",
-                    "請注意，搜尋功能需使用全名"
                 ])
                 
             
